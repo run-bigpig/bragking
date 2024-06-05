@@ -18,6 +18,31 @@ func NewStatistic(ctx *fiber.Ctx) *Statistic {
 	}
 }
 
+func (s *Statistic) FindDateList(req *types.DateListReq) ([][]interface{}, error) {
+	var (
+		dateList [][]interface{}
+	)
+	answer1List, err := s.npModel.FindDateCountList(s.ctx.Context(), map[string]interface{}{req.Name: 1})
+	if err != nil {
+		return nil, err
+	}
+	answer2List, err := s.npModel.FindDateCountList(s.ctx.Context(), map[string]interface{}{req.Name: 2})
+	if err != nil {
+		return nil, err
+	}
+	for _, v := range answer1List {
+		temp := make([]any, 0)
+		temp = append(temp, v.Date, v.Count)
+		for _, v2 := range answer2List {
+			if v.Date == v2.Date {
+				temp = append(temp, v2.Count)
+			}
+		}
+		dateList = append(dateList, temp)
+	}
+	return dateList, nil
+}
+
 // FindCloverBet 获取老C抽成
 func (s *Statistic) FindCloverBet() (int64, error) {
 	maxUser, err := s.npModel.FindTotalBet(s.ctx.Context())

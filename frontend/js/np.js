@@ -2,6 +2,7 @@ var $ = layui.jquery;
 var baseUrl = "http://127.0.0.1:8080/";
 layui.use(function () {
     getBaseData()
+    getChartData()
     getTableData()
 });
 
@@ -45,6 +46,73 @@ function getBaseData(){
     send(baseUrl + "api/findmyanswercountlist", "post", {answer:2}, function (res) {
         $("#choose2").text(res.data.count)
     })
+}
+
+function chartInit(){
+    let chartMap = new Map();
+    let chartArr = ["setchart","choosechart"]
+    for (let i = 0; i < 2; i++) {
+        chartMap[chartArr[i]] = echarts.init(document.getElementById(chartArr[i]),myEchartsTheme);
+        let option = {
+            dataset:{
+                source:[]
+            },
+            legend:{
+                data: ['答案1','答案2']
+            },
+            tooltip: {
+                trigger: 'axis',
+                textStyle:{color:"#fff"}
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            toolbox: {
+                feature: {
+                    saveAsImage: {}
+                }
+            },
+            xAxis: {
+                type: 'category',
+                boundaryGap: false,
+            },
+            yAxis: {
+                type: 'value'
+            },
+            series: [
+                {name: '答案1', type: 'line'},
+                {name: '答案2', type: 'line'},
+            ]
+        };
+        chartMap[chartArr[i]].setOption(option);
+    }
+    return chartMap
+}
+
+function getChartData(){
+    let chartMap = chartInit();
+    console.log(chartMap)
+    send(baseUrl + "api/finddatelist", "post", {name:"correct_answer"}, function (res) {
+        chartMap["setchart"].setOption({
+            dataset:{
+                source:res.data
+            }
+        })
+    })
+    send(baseUrl + "api/finddatelist", "post", {name:"my_answer"}, function (res) {
+        chartMap["choosechart"].setOption({
+            dataset:{
+                source:res.data
+            }
+        })
+    })
+    window.onresize = function () {
+        chartMap["setchart"].resize();
+        chartMap["choosechart"].resize();
+    };
 }
 
 function tableInit(){

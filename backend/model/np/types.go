@@ -44,3 +44,8 @@ type MaxCountUser struct {
 type Bet struct {
 	Total int64 `bson:"total,omitempty" json:"total,omitempty"`
 }
+
+type DateCountList struct {
+	Date  string `bson:"date,omitempty" json:"date,omitempty"`
+	Count int64  `bson:"count,omitempty" json:"count,omitempty"`
+}

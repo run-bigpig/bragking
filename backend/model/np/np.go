@@ -129,7 +129,7 @@ func (m *NpModel) FindTotalBet(ctx context.Context) (int64, error) {
 	return data[0].Total, err
 }
 
-// 获取获得妖晶最多的
+// FindMaxBetUser 获取获得妖晶最多的
 func (m *NpModel) FindMaxBetUser(ctx context.Context, userFiled string, where map[string]interface{}) (*MaxCountUser, error) {
 	var data []*MaxCountUser
 	option := &options.AggregateOptions{}
@@ -254,6 +254,28 @@ func (m *NpModel) FindContestantMyAnswerCountList(ctx context.Context, Contestan
 				"bet":        1,
 			},
 		},
+	}
+	res, err := m.conn.Aggregate(ctx, pipeline, option)
+	if errors.Is(err, mongo.ErrNoDocuments) {
+		return nil, nil
+	}
+	err = res.All(ctx, &list)
+	if err != nil {
+		return nil, err
+	}
+	return list, err
+}
+
+// FindDateCountList 获取按日期分组的指定条件数量的列表
+func (m *NpModel) FindDateCountList(ctx context.Context, where map[string]interface{}) ([]*DateCountList, error) {
+	var list []*DateCountList
+	option := &options.AggregateOptions{}
+	pipeline := bson.A{
+		bson.M{"$match": where},
+		bson.M{"$addFields": bson.M{"date": bson.M{"$dateToString": bson.M{"format": "%Y-%m-%d", "date": "$question_time", "timezone": "Asia/Shanghai"}}}},
+		bson.M{"$group": bson.M{"_id": "$date", "count": bson.M{"$sum": 1}}},
+		bson.M{"$sort": bson.M{"_id": 1}},
+		bson.M{"$project": bson.M{"_id": 0, "date": "$_id", "count": 1}},
 	}
 	res, err := m.conn.Aggregate(ctx, pipeline, option)
 	if errors.Is(err, mongo.ErrNoDocuments) {

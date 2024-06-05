@@ -14,4 +14,5 @@ func NewRouter(app *fiber.App) {
 	api.Post("findmaxuser", FindMaxUser)
 	api.Post("findmaxbetuser", FindMaxBetUser)
 	api.Post("findcloverbet", FindCloverBet)
+	api.Post("finddatelist", FindDateList)
 }

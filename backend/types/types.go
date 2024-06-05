@@ -77,3 +77,11 @@ type MaxCountUser struct {
 	User  string `bson:"user,omitempty" json:"user,omitempty"`
 	Count int64  `bson:"count,omitempty" json:"count,omitempty"`
 }
+
+type DateListReq struct {
+	Name string `json:"name"`
+}
+
+type DateList struct {
+	List []interface{}
+}

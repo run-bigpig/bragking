@@ -10,6 +10,19 @@ func IndexHandler(ctx *fiber.Ctx) error {
 	return ctx.Render("index", nil)
 }
 
+func FindDateList(ctx *fiber.Ctx) error {
+	var req types.DateListReq
+	err := ctx.BodyParser(&req)
+	if err != nil {
+		return fail(ctx, 500, err)
+	}
+	list, err := logic.NewStatistic(ctx).FindDateList(&req)
+	if err != nil {
+		return fail(ctx, 500, err)
+	}
+	return success(ctx, list)
+}
+
 func FindCloverBet(ctx *fiber.Ctx) error {
 	total, err := logic.NewStatistic(ctx).FindCloverBet()
 	if err != nil {
